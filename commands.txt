@@ -1,0 +1,18 @@
+4. Common JDK
+./mvnw quarkus:dev
+
+5. Native image
+./mvnw package -Pnative
+After
+./target/lab1_final-1.0-SNAPSHOT-runner
+
+6. Docker
+Add packages and create folders
+./mvnw package
+Build docker image
+docker build -f src/main/docker/Dockerfile.jvm -t quarkus/code-with-quarkus-jvm .
+Run docker container with built image
+docker run -i --rm -p 8080:8080 quarkus/code-with-quarkus-jvm
+
+Test any method: http://127.0.0.1:8080/hello
+
