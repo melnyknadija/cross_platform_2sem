@@ -16,3 +16,15 @@ docker run -i --rm -p 8080:8080 quarkus/code-with-quarkus-jvm
 
 Test any method: http://127.0.0.1:8080/hello
 
+--------- 3 LR
+
+./mvnw clean
+For gRPC
+./mvnw clean compile
+For gRPC
+./mvnw clean install -DskipTests
+Start service (in different terminals)
+ ./mvnw -f product_service/pom.xml quarkus:dev
+ ./mvnw -f comment_service/pom.xml quarkus:dev
+ ./mvnw -f sales-service/pom.xml quarkus:dev
+
