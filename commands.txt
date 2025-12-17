@@ -28,3 +28,10 @@ Start service (in different terminals)
  ./mvnw -f comment_service/pom.xml quarkus:dev
  ./mvnw -f sales-service/pom.xml quarkus:dev
 
+
+----- 5 LR
+Run mongodb in docker
+Start service (in different terminals)
+ ./mvnw -f product_service/pom.xml quarkus:dev
+ ./mvnw -f comment_service/pom.xml quarkus:dev
+ ./mvnw -f sales-service/pom.xml quarkus:dev

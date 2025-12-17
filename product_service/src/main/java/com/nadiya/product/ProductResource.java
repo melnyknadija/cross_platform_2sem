@@ -1,33 +1,60 @@
 package com.nadiya.product;
 
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import java.util.List;
+import org.bson.types.ObjectId;
 
 @Path("/products")
 @Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
 public class ProductResource {
 
-    private final List<Product> products = List.of(
-            new Product(1L, "Laptop", 1500.0),
-            new Product(2L, "Smartphone", 800.0),
-            new Product(3L, "Headphones", 150.0)
-    );
-
     @GET
-    public List<Product> getAll() {
-        return products;
+    public List<Product> listAll() {
+        return Product.listAll();
+    }
+
+    @POST
+    public Response create(Product product) {
+        product.persist();
+        return Response.status(201).entity(product).build();
     }
 
     @GET
     @Path("/{id}")
-    public Product getById(@PathParam("id") Long id) {
-        return products.stream()
-                .filter(p -> p.id().equals(id))
-                .findFirst()
-                .orElseThrow(() -> new jakarta.ws.rs.NotFoundException());
+    public Product get(@PathParam("id") String id) {
+        return Product.findById(new ObjectId(id));
+    }
+
+    @PUT
+    @Path("/{id}")
+    public Product update(@PathParam("id") String id, Product product) {
+        Product entity = Product.findById(new ObjectId(id));
+        if (entity == null) {
+            throw new NotFoundException();
+        }
+        entity.name = product.name;
+        entity.description = product.description;
+        entity.price = product.price;
+        entity.update();
+        return entity;
+    }
+
+    @DELETE
+    @Path("/{id}")
+    public void delete(@PathParam("id") String id) {
+        Product entity = Product.findById(new ObjectId(id));
+        if (entity == null) {
+            throw new NotFoundException();
+        }
+        entity.delete();
+    }
+
+    @GET
+    @Path("/name/{name}")
+    public Product get_by_name(@PathParam("name") String name) {
+        return Product.findByName(name);
     }
 }
