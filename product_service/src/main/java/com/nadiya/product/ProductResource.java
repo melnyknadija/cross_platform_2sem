@@ -1,15 +1,22 @@
 package com.nadiya.product;
 
+import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import java.util.List;
 import org.bson.types.ObjectId;
+import org.eclipse.microprofile.reactive.messaging.Channel;
+import org.eclipse.microprofile.reactive.messaging.Emitter;
 
 @Path("/products")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class ProductResource {
+
+    @Inject
+    @Channel("product-created")
+    Emitter<String> productEmitter;
 
     @GET
     public List<Product> listAll() {
@@ -19,6 +26,7 @@ public class ProductResource {
     @POST
     public Response create(Product product) {
         product.persist();
+        productEmitter.send(product.id.toString());
         return Response.status(201).entity(product).build();
     }
 
