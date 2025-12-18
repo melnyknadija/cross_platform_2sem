@@ -1,29 +1,77 @@
 package com.nadiya.sales;
 
-import io.quarkus.grpc.GrpcClient;
+import io.smallrye.mutiny.Uni;
+import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
-import io.smallrye.mutiny.Uni;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Random;
+import io.quarkus.grpc.GrpcClient;
+
 
 @Path("/sales")
 @Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
 public class SalesResource {
+
+    @Inject
+    SalesRepository salesRepository;
 
     @GrpcClient("product-service")
     com.nadiya.grpc.ProductGrpc productClient;
 
-    private final Random random = new Random();
+    @GET
+    public List<Sale> getAll() {
+        return salesRepository.listAll();
+    }
+
+    @POST
+    @Transactional
+    public Sale create(SaleRecord record) {
+            Sale entity = new Sale();
+            entity.setProductName(record.productName());
+            entity.setAmount(record.amount());
+            entity.setSaleDate(LocalDateTime.now());
+            entity.setType(record.type());
+
+            salesRepository.persist(entity);
+            return entity;
+        }
+
 
     @GET
-    @Path("/last-sales")
-    public List<SaleRecord> getMockHttpSales() {
-        return List.of(
-                new SaleRecord(1L, "Static Phone", 500.0, LocalDateTime.now(), "HTTP"),
-                new SaleRecord(2L, "Static Laptop", 1200.0, LocalDateTime.now(), "HTTP")
-        );
+    @Path("/{id}")
+    public Sale getById(@PathParam("id") Long id) {
+        Sale entity = salesRepository.findById(id);
+        if (entity == null) {
+            throw new NotFoundException();
+        }
+        return entity;
+    }
+
+    @PUT
+    @Path("/{id}")
+    @Transactional
+    public Sale update(@PathParam("id") Long id, SaleRecord record) {
+        Sale entity = salesRepository.findById(id);
+        if (entity == null) {
+            throw new NotFoundException();
+        }
+        entity.setProductName(record.productName());
+        entity.setAmount(record.amount());
+        entity.setType(record.type());
+        return entity;
+    }
+
+    @DELETE
+    @Path("/{id}")
+    @Transactional
+    public void delete(@PathParam("id") Long id) {
+        boolean deleted = salesRepository.deleteById(id);
+        if (!deleted) {
+            throw new NotFoundException();
+        }
     }
 
     @GET
