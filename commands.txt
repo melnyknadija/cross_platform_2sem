@@ -31,7 +31,19 @@ Start service (in different terminals)
 
 ----- 5 LR
 Run mongodb in docker
+docker run -p 27017:27017 -d -e MONGO_INITDB_ROOT_USERNAME=root -e MONGO_INITDB_ROOT_PASSWORD=root mongo
+
 Start service (in different terminals)
  ./mvnw -f product_service/pom.xml quarkus:dev
  ./mvnw -f comment_service/pom.xml quarkus:dev
  ./mvnw -f sales-service/pom.xml quarkus:dev
+
+
+---- 6 LR
+Run mysql
+docker run -d -p 3306:3306 -e MYSQL_ROOT_PASSWORD=root mysql
+in mysql execute
+CREATE DATABASE sales_db;
+USE sales_db;
+Run command
+`create table sales (id bigint not null auto_increment, amount float(53) not null, productName varchar(255), saleDate datetime(6), type varchar(255), primary key (id)) engine=InnoDB;`
